@@ -1,5 +1,14 @@
-import { responseFromStore } from "../dtos/store.dto.js";
-import { addStore, getStore } from "../repositories/store.repository.js";
+import {
+  responseFromStore,
+  responseFromReviews,
+  responseFromMissions,
+} from "../dtos/store.dto.js";
+import {
+  addStore,
+  getStore,
+  getAllStoreMissions,
+  getAllStoreReviews,
+} from "../repositories/store.repository.js";
 
 export const storeCreate = async (data) => {
   const joinStoreId = await addStore({
@@ -7,6 +16,8 @@ export const storeCreate = async (data) => {
     regionId: data.regionId,
     storeTypeId: data.storeTypeId,
     location: data.location,
+    is_opened: data.is_opened,
+    star: data.star,
   });
 
   if (joinStoreId === null) {
@@ -16,4 +27,14 @@ export const storeCreate = async (data) => {
   const store = await getStore(joinStoreId);
 
   return responseFromStore({ store });
+};
+
+export const listStoreReviews = async (storeId) => {
+  const reviews = await getAllStoreReviews(storeId);
+  return responseFromReviews(reviews);
+};
+
+export const listStoreMissions = async (storeId) => {
+  const missions = await getAllStoreMissions(storeId);
+  return responseFromMissions(missions);
 };

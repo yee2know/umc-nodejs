@@ -1,0 +1,219 @@
+// Prisma schema based on provided ERD
+
+// Generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum InquiryStatus {
+  PENDING
+  ANSWERED
+  CLOSED
+}
+
+enum MissionStatus {
+  SUCCESS
+  FAIL
+  PENDING
+}
+
+// MODELS
+model User {
+  id               BigInt   @id @default(autoincrement())
+  name             String   @db.VarChar(20)
+  gender           Gender
+  birth            DateTime @db.Date
+  address          String   @db.VarChar(50)
+  point            BigInt
+  status           String   @db.VarChar(20)
+  inactive_date    DateTime? @db.DateTime(6)
+  email            String   @unique @db.VarChar(50)
+  is_auth          Boolean
+  phone_number     String   @db.VarChar(20)
+  created_at       DateTime @default(now()) @db.DateTime(6)
+  updated_at       DateTime @updatedAt @db.DateTime(6)
+
+  reviews          Review[]
+  alarms           Alarm[]
+  inquiries        Inquiry[]
+  answers          Answer[]
+  user_foods       UserAndFood[]
+  mission_completions MissionCompleted[]
+  user_agreements  UserAgree[]
+}
+
+model Review {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  store_id   BigInt
+  review_star Int
+  body       String   @db.Text
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  store      Store    @relation(fields: [store_id], references: [id])
+  images     ReviewImage[]
+}
+
+model ReviewImage {
+  id         BigInt   @id @default(autoincrement())
+  review_id  BigInt
+  url        String   @db.Text
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  review     Review   @relation(fields: [review_id], references: [id])
+}
+
+model Store {
+  id           BigInt   @id @default(autoincrement())
+  store_type_id BigInt
+  region_id    BigInt
+  name         String   @db.VarChar(20)
+  location     String   @db.VarChar(30)
+  is_opened    Boolean
+  star         Float
+  created_at   DateTime @default(now()) @db.DateTime(6)
+  updated_at   DateTime @updatedAt @db.DateTime(6)
+
+  region       Region   @relation(fields: [region_id], references: [id])
+  store_type   StoreType @relation(fields: [store_type_id], references: [id])
+  reviews      Review[]
+  missions     Mission[]
+}
+
+model Region {
+  id         BigInt   @id @default(autoincrement())
+  name       String   @db.VarChar(20)
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  stores     Store[]
+}
+
+model StoreType {
+  id   BigInt @id @default(autoincrement())
+  name String @db.VarChar(20)
+
+  stores Store[]
+}
+
+model Mission {
+  id         BigInt   @id @default(autoincrement())
+  store_id   BigInt
+  d_day      DateTime @db.Date
+  goal_money Int
+  reward     Int
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  store      Store    @relation(fields: [store_id], references: [id])
+  completions MissionCompleted[]
+}
+
+model MissionCompleted {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  mission_id BigInt
+  status     MissionStatus
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  mission    Mission  @relation(fields: [mission_id], references: [id])
+}
+
+model FoodType {
+  id         BigInt   @id @default(autoincrement())
+  type       String   @db.VarChar(20)
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user_foods UserAndFood[]
+}
+
+model UserAndFood {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  food_id    BigInt
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  food       FoodType @relation(fields: [food_id], references: [id])
+}
+
+model Alarm {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  is_confirmed Boolean
+  dtype      String   @db.VarChar(30)
+  title      String   @db.VarChar(30)
+  body       String   @db.Text
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+model Inquiry {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  title      String   @db.VarChar(20)
+  type       String   @db.VarChar(20)
+  body       String   @db.Text
+  status     InquiryStatus
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  answer     Answer?
+}
+
+model Answer {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  inquiry_id BigInt   @unique
+  title      String   @db.VarChar(20)
+  body       String   @db.Text
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  inquiry    Inquiry  @relation(fields: [inquiry_id], references: [id])
+}
+
+model Terms {
+  id         BigInt   @id @default(autoincrement())
+  title      String   @db.VarChar(20)
+  body       String   @db.Text
+  optional   Boolean
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  agreements UserAgree[]
+}
+
+model UserAgree {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  terms_id   BigInt
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @updatedAt @db.DateTime(6)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  terms      Terms    @relation(fields: [terms_id], references: [id])
+}

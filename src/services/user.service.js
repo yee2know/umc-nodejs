@@ -1,9 +1,15 @@
-import { responseFromUser } from "../dtos/user.dto.js";
+import {
+  responseFromUser,
+  responseFromReviews,
+  responseFromMissions,
+} from "../dtos/user.dto.js";
 import {
   addUser,
   getUser,
   getUserPreferencesByUserId,
   setPreference,
+  getAllUserReviews,
+  getAllUserMissions,
 } from "../repositories/user.repository.js";
 
 export const userSignUp = async (data) => {
@@ -13,7 +19,10 @@ export const userSignUp = async (data) => {
     gender: data.gender,
     birth: data.birth,
     address: data.address,
-    phoneNumber: data.phoneNumber,
+    phone_number: data.phone_number,
+    point: data.point,
+    status: data.status,
+    is_auth: data.is_auth,
   });
 
   if (joinUserId === null) {
@@ -28,4 +37,14 @@ export const userSignUp = async (data) => {
   const preferences = await getUserPreferencesByUserId(joinUserId);
 
   return responseFromUser({ user, preferences });
+};
+
+export const listUserReviews = async (userId) => {
+  const reviews = await getAllUserReviews(userId);
+  return responseFromReviews(reviews);
+};
+
+export const listUserMissions = async (userId, cursor, status) => {
+  const reviews = await getAllUserMissions(userId, cursor, status);
+  return responseFromMissions(reviews);
 };

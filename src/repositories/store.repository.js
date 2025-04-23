@@ -1,56 +1,69 @@
-import { pool } from "../db.config.js";
+// store.repository.js - Prisma ORM 버전
+
+import { prisma } from "../db.config.js";
 
 // Store 데이터 삽입
 export const addStore = async (data) => {
-  const conn = await pool.getConnection();
+  // 이미 동일한 이름의 스토어가 존재하는지 확인
+  const existingStore = await prisma.store.findFirst({
+    where: { name: data.name },
+  });
 
-  try {
-    const [confirm] = await pool.query(
-      `SELECT EXISTS(SELECT 1 FROM store WHERE name = ?) as isExistStoreName;`,
-      data.name
-    );
-
-    if (confirm[0].isExistStoreName) {
-      return null;
-    }
-
-    const [result] = await pool.query(
-      `INSERT INTO store (name, region_id, store_type_id, location) VALUES (?, ?, ?, ?);`,
-      [data.name, data.regionId, data.storeTypeId, data.location]
-    );
-
-    return result.insertId;
-  } catch (err) {
-    throw new Error(
-      `오류가 발생했어요. 요청 파라미터를 확인해주세요.1 (${err})`
-    );
-  } finally {
-    conn.release();
+  if (existingStore) {
+    return null;
   }
+
+  const result = await prisma.store.create({
+    data: {
+      name: data.name,
+      region_id: BigInt(data.regionId),
+      store_type_id: BigInt(data.storeTypeId),
+      location: data.location,
+      is_opened: data.is_opened,
+      star: data.star,
+    },
+  });
+
+  return result.id;
 };
 
 // Store 정보 얻기
 export const getStore = async (storeId) => {
-  const conn = await pool.getConnection();
+  const store = await prisma.store.findFirst({
+    where: { id: BigInt(storeId) },
+  });
 
-  try {
-    const [store] = await pool.query(
-      `SELECT * FROM store WHERE id = ?;`,
-      storeId
-    );
-
-    console.log(store);
-
-    if (store.length == 0) {
-      return null;
-    }
-
-    return store;
-  } catch (err) {
-    throw new Error(
-      `오류가 발생했어요. 요청 파라미터를 확인해주세요.2 (${err})`
-    );
-  } finally {
-    conn.release();
+  if (!store) {
+    return null;
   }
+
+  return store;
+};
+
+export const getAllStoreReviews = async (storeId, cursor) => {
+  const reviews = await prisma.userStoreReview.findMany({
+    select: { id: true, content: true, store: true, user: true },
+    where: { storeId: storeId, id: { gt: cursor } },
+    orderBy: { id: "asc" },
+    take: 5,
+  });
+
+  return reviews;
+};
+
+export const getAllStoreMissions = async (storeId, cursor) => {
+  const missions = await prisma.mission.findMany({
+    select: {
+      id: true,
+      d_day: true,
+      store_id: true,
+      goal_money: true,
+      reward: true,
+    },
+    where: { store_id: storeId, id: { gt: cursor } },
+    orderBy: { id: "asc" },
+    take: 5,
+  });
+
+  return missions;
 };

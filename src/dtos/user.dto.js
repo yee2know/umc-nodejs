@@ -7,14 +7,40 @@ export const bodyToUser = (body) => {
     gender: body.gender,
     birth: birth,
     address: body.address || "",
-    phoneNumber: body.phoneNumber,
+    phone_number: body.phoneNumber,
     preferences: body.preferences,
+    point: body.point,
+    status: body.status,
+    is_auth: body.is_auth,
   };
 };
 
-export const responseFromUser = (body) => {
+export const responseFromUser = ({ user, preferences }) => {
+  const preferFoods = preferences.map(
+    (preference) => preference.foodCategory.name
+  );
+
   return {
-    user: body.user,
-    preferences: body.preferences,
+    email: user.email,
+    name: user.name,
+    preferCategory: preferFoods,
+  };
+};
+
+export const responseFromReviews = (reviews) => {
+  return {
+    data: reviews,
+    pagination: {
+      cursor: reviews.length ? reviews[reviews.length - 1].id : null,
+    },
+  };
+};
+
+export const responseFromMissions = (missions) => {
+  return {
+    data: missions,
+    pagination: {
+      cursor: missions.length ? missions[missions.length - 1].id : null,
+    },
   };
 };
