@@ -11,7 +11,7 @@ export const handleStoreCreate = async (req, res, next) => {
   console.log("body:", req.body); // 값이 잘 들어오나 확인하기 위한 테스트용
 
   const store = await storeCreate(bodyToStore(req.body, req.params));
-  res.status(StatusCodes.OK).json({ result: store });
+  res.status(StatusCodes.OK).success(store);
 };
 
 export const handleListStoreReviews = async (req, res, next) => {
@@ -27,5 +27,5 @@ export const handleListStoreMissions = async (req, res, next) => {
     parseInt(req.params.storeId),
     typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0
   );
-  res.status(StatusCodes.OK).json({ result: missions });
+  res.status(StatusCodes.OK).success(missions);
 };

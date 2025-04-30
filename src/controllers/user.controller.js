@@ -11,7 +11,7 @@ export const handleUserSignUp = async (req, res, next) => {
   console.log("body:", req.body); // 값이 잘 들어오나 확인하기 위한 테스트용
 
   const user = await userSignUp(bodyToUser(req.body));
-  res.status(StatusCodes.OK).json({ result: user });
+  res.status(StatusCodes.OK).success(user);
 };
 
 export const handleListUserReviews = async (req, res, next) => {
@@ -19,7 +19,7 @@ export const handleListUserReviews = async (req, res, next) => {
     parseInt(req.params.userId),
     typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0
   );
-  res.status(StatusCodes.OK).json({ result: reviews });
+  res.status(StatusCodes.OK).success(reviews);
 };
 
 export const handleListUserMissions = async (req, res, next) => {
@@ -28,5 +28,5 @@ export const handleListUserMissions = async (req, res, next) => {
     typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0,
     req.query.status
   );
-  res.status(StatusCodes.OK).json({ result: missions });
+  res.status(StatusCodes.OK).success(missions);
 };

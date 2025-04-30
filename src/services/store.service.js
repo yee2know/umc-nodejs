@@ -3,6 +3,7 @@ import {
   responseFromReviews,
   responseFromMissions,
 } from "../dtos/store.dto.js";
+import { DuplicateStoreError } from "../errors.js";
 import {
   addStore,
   getStore,
@@ -21,7 +22,7 @@ export const storeCreate = async (data) => {
   });
 
   if (joinStoreId === null) {
-    throw new Error("이미 존재하는 상점 이름입니다.");
+    throw new DuplicateStoreError("이미 존재하는 상점 이름입니다.");
   }
 
   const store = await getStore(joinStoreId);

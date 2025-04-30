@@ -1,4 +1,5 @@
 import { responseFromReview } from "../dtos/review.dto.js";
+import { DuplicateUserReviewError } from "../errors.js";
 import { addReview, getReview } from "../repositories/review.repository.js";
 
 export const reviewPost = async (data) => {
@@ -10,7 +11,7 @@ export const reviewPost = async (data) => {
   });
 
   if (joinReviewId === null) {
-    throw new Error("이미 존재하는 리뷰입니다.");
+    throw new DuplicateUserReviewError("이미 존재하는 리뷰입니다.");
   }
 
   const review = await getReview(joinReviewId);

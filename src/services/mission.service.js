@@ -3,6 +3,10 @@ import {
   responseFromMissionChallenge,
 } from "../dtos/mission.dto.js";
 import {
+  ChallengedMissionError,
+  DuplicateStoreMissionError,
+} from "../errors.js";
+import {
   addMission,
   getMission,
   addMissionChallenge,
@@ -18,7 +22,7 @@ export const missionCreate = async (data) => {
   });
 
   if (joinMissionId === null) {
-    throw new Error("이미 존재하는 미션입니다.");
+    throw new DuplicateStoreMissionError("이미 존재하는 미션입니다.");
   }
 
   const mission = await getMission(joinMissionId);
@@ -34,7 +38,7 @@ export const missionChallenge = async (data) => {
   });
 
   if (joinMissionChallengeId === null) {
-    throw new Error("이미 도전/실패한 미션입니다.");
+    throw new ChallengedMissionError("이미 도전/실패한 미션입니다.");
   }
 
   const missionChallenge = await getMissionChallenge(joinMissionChallengeId);
