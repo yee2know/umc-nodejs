@@ -3,9 +3,9 @@
 import { prisma } from "../db.config.js";
 
 // Store 데이터 삽입
-export const addStore = async (data) => {
+export const addStore = async (data, tx) => {
   // 이미 동일한 이름의 스토어가 존재하는지 확인
-  const existingStore = await prisma.store.findFirst({
+  const existingStore = await tx.store.findFirst({
     where: { name: data.name },
   });
 
@@ -13,7 +13,7 @@ export const addStore = async (data) => {
     return null;
   }
 
-  const result = await prisma.store.create({
+  const result = await tx.store.create({
     data: {
       name: data.name,
       region_id: BigInt(data.regionId),
@@ -28,8 +28,8 @@ export const addStore = async (data) => {
 };
 
 // Store 정보 얻기
-export const getStore = async (storeId) => {
-  const store = await prisma.store.findFirst({
+export const getStore = async (storeId, tx) => {
+  const store = await tx.store.findFirst({
     where: { id: BigInt(storeId) },
   });
 

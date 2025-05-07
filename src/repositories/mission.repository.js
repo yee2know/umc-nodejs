@@ -4,7 +4,7 @@ import { prisma } from "../db.config.js";
 
 // Mission 데이터 삽입
 export const addMission = async (data) => {
-  const existing = await prisma.review.findFirst({
+  const existing = await prisma.mission.findFirst({
     where: { store_id: BigInt(data.store_id) },
   });
 

@@ -22,7 +22,7 @@ export const missionCreate = async (data) => {
   });
 
   if (joinMissionId === null) {
-    throw new DuplicateStoreMissionError("이미 존재하는 미션입니다.");
+    throw new DuplicateStoreMissionError("이미 존재하는 미션입니다.", data);
   }
 
   const mission = await getMission(joinMissionId);
@@ -38,7 +38,7 @@ export const missionChallenge = async (data) => {
   });
 
   if (joinMissionChallengeId === null) {
-    throw new ChallengedMissionError("이미 도전/실패한 미션입니다.");
+    throw new ChallengedMissionError("이미 도전/실패한 미션입니다.", data);
   }
 
   const missionChallenge = await getMissionChallenge(joinMissionChallengeId);

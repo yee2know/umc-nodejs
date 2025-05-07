@@ -5,7 +5,17 @@ import { PrismaClient } from "@prisma/client";
 export const prisma = new PrismaClient({ log: ["query"] });
 
 dotenv.config();
+// ⏱️ Prisma 미들웨어: 쿼리 실행 시간 측정
+prisma.$use(async (params, next) => {
+  const start = Date.now();
 
+  const result = await next(params); // 실제 쿼리 실행
+
+  const duration = Date.now() - start;
+  console.log(`[⏱️ Prisma] ${params.model}.${params.action} - ${duration}ms`);
+
+  return result;
+});
 export const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost", // mysql의 hostname
   user: process.env.DB_USER || "root", // user 이름

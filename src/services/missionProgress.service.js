@@ -12,7 +12,7 @@ export const missionChangeProgress = async (missionId, data) => {
   );
 
   if (joinMissionProgressId === null) {
-    throw new NoMissionError("미션이 존재하지 않습니다.");
+    throw new NoMissionError("미션이 존재하지 않습니다.", data);
   }
 
   const missionProgress = await getMissionProgress(joinMissionProgressId);

@@ -11,7 +11,7 @@ export const reviewPost = async (data) => {
   });
 
   if (joinReviewId === null) {
-    throw new DuplicateUserReviewError("이미 존재하는 리뷰입니다.");
+    throw new DuplicateUserReviewError("이미 존재하는 리뷰입니다.", data);
   }
 
   const review = await getReview(joinReviewId);

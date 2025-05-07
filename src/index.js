@@ -17,8 +17,12 @@ import {
   handleMissionCreate,
   handleMissionChallenge,
 } from "./controllers/mission.controller.js";
-
 import { handleMissionProgress } from "./controllers/missionProgress.controller.js";
+import swaggerAutogen from "swagger-autogen";
+import swaggerUiExpress from "swagger-ui-express";
+import { swaggerSpec } from "./docs/swagger.js";
+import swaggerUi from "swagger-ui-express";
+
 dotenv.config();
 
 const app = express();
@@ -27,8 +31,8 @@ const port = process.env.PORT;
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */
 app.use((req, res, next) => {
-  res.success = (success) => {
-    return res.json({ resultType: "SUCCESS", error: null, success });
+  res.success = (data) => {
+    return res.json({ resultType: "SUCCESS", error: null, data });
   };
 
   res.error = ({ errorCode = "unknown", reason = null, data = null }) => {
@@ -47,6 +51,7 @@ app.use(
     threshold: 512, // bytes 단위
   })
 );
+
 app.use(cors()); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
@@ -54,6 +59,15 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 app.set("json replacer", (_, value) =>
   typeof value === "bigint" ? value.toString() : value
 );
+// Swagger UI 페이지
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// JSON 형태 명세도 제공 (Swagger Editor 등에서 사용 가능)
+app.get("/openapi.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -80,6 +94,7 @@ app.patch("/missions/:missionId", handleMissionProgress); //특정 유저 미션
 
 // 예시 라우터
 app.get("/large-response", (req, res) => {
+  // #swagger.ignore = true
   const largeText = "Hello".repeat(1000); // 일부러 큰 응답 생성
   res.send(largeText);
 });
@@ -98,6 +113,7 @@ app.use((err, req, res, next) => {
     data: err.data || null,
   });
 });
+
 /*
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
@@ -106,6 +122,7 @@ app.use((err, req, res, next) => {
   });
 });
 */
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

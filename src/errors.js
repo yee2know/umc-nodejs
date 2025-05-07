@@ -1,55 +1,49 @@
-export class DuplicateUserEmailError extends Error {
-  errorCode = "U001";
-
-  constructor(reason, data) {
+export class BaseError extends Error {
+  constructor(errorCode, reason, data) {
     super(reason);
+
+    this.name = this.constructor.name;
+    this.errorCode = errorCode;
     this.reason = reason;
     this.data = data;
+
+    // 프로토타입 체인 문제 해결
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
-export class DuplicateUserReviewError extends Error {
-  errorCode = "R001";
-
+export class DuplicateUserEmailError extends BaseError {
   constructor(reason, data) {
-    super(reason);
-    this.reason = reason;
-    this.data = data;
+    super("U001", reason, data);
   }
 }
-export class DuplicateStoreError extends Error {
-  errorCode = "S001";
 
+export class DuplicateUserReviewError extends BaseError {
   constructor(reason, data) {
-    super(reason);
-    this.reason = reason;
-    this.data = data;
+    super("R001", reason, data);
   }
 }
-export class DuplicateStoreMissionError extends Error {
-  errorCode = "S002";
 
+export class DuplicateStoreError extends BaseError {
   constructor(reason, data) {
-    super(reason);
-    this.reason = reason;
-    this.data = data;
+    super("S001", reason, data);
   }
 }
-export class ChallengedMissionError extends Error {
-  errorCode = "M001";
 
+export class DuplicateStoreMissionError extends BaseError {
   constructor(reason, data) {
-    super(reason);
-    this.reason = reason;
-    this.data = data;
+    super("S002", reason, data);
   }
 }
-export class NoMissionError extends Error {
-  errorCode = "M002";
 
+export class ChallengedMissionError extends BaseError {
   constructor(reason, data) {
-    super(reason);
-    this.reason = reason;
-    this.data = data;
+    super("M001", reason, data);
+  }
+}
+
+export class NoMissionError extends BaseError {
+  constructor(reason, data) {
+    super("M002", reason, data);
   }
 }
