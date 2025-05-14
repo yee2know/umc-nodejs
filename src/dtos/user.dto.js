@@ -44,3 +44,11 @@ export const responseFromMissions = (missions) => {
     },
   };
 };
+export class UpdateUserProfileDto {
+  constructor({ phone_number, birth, address, gender }) {
+    this.phone_number = phone_number;
+    this.birth = birth ? new Date(birth) : null;
+    this.address = address;
+    this.gender = gender;
+  }
+}

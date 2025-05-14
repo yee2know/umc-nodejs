@@ -11,6 +11,7 @@ import {
   getAllUserReviews,
   getAllUserMissions,
 } from "../repositories/user.repository.js";
+import { UserRepository } from "../repositories/user.repository.js";
 import { DuplicateUserEmailError } from "../errors.js";
 export const userSignUp = async (data) => {
   const joinUserId = await addUser({
@@ -23,6 +24,7 @@ export const userSignUp = async (data) => {
     point: data.point,
     status: data.status,
     is_auth: data.is_auth,
+    auth: data.auth,
   });
 
   if (joinUserId === null) {
@@ -47,4 +49,13 @@ export const listUserReviews = async (userId) => {
 export const listUserMissions = async (userId, cursor, status) => {
   const reviews = await getAllUserMissions(userId, cursor, status);
   return responseFromMissions(reviews);
+};
+
+export const UserService = {
+  async updateUserProfile(userId, updateDto) {
+    const existingUser = await UserRepository.findById(userId);
+    if (!existingUser) throw new Error("User not found");
+
+    return UserRepository.updateProfile(userId, updateDto);
+  },
 };

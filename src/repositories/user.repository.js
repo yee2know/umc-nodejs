@@ -64,3 +64,16 @@ export const getAllUserMissions = async (userId, cursor, status) => {
 
   return reviews;
 };
+
+export const UserRepository = {
+  async updateProfile(userId, data) {
+    return prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  },
+
+  async findById(userId) {
+    return prisma.user.findUnique({ where: { id: userId } });
+  },
+};
